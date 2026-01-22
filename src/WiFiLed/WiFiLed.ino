@@ -1,5 +1,5 @@
 /*
-Goal: set up ESP32 as access point, run a web server on it, have button on web page that turns led on andd off
+Goal: set up ESP32 as access point, run a web server on it, have button on web page that turns led on and off
 To be used with board "DOIT ESP32 DEVKIT V1"
 
 Inspiration:
