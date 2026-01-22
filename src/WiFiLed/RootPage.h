@@ -7,7 +7,16 @@ static const char* RootPage = R"==(
   <title>Toggle the led!</title>
 </head>
 <body>
-  <p>Press the button to toggle the led!</p>
+  <h1 id="toggleTrigger">Press here to toggle the led!</h1>
 </body>
+
+<script>
+  function toggle(e) {
+    fetch("/toggleLed");
+  }
+
+  var toggleTrigger = document.getElementById("toggleTrigger");
+  toggleTrigger.addEventListener("click", toggle);
+</script>
 </html>
 )==";
