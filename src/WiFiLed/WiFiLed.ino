@@ -12,7 +12,7 @@ Inspiration:
 #include <WebServer.h>
 
 const char* ssid = "Nicks-ESP32";
-const char* password = "Samba";
+const char* password = "SambaSamba";
 
 WebServer server(80);
 
