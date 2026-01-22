@@ -11,6 +11,8 @@ Inspiration:
 #include <WiFi.h>
 #include <WebServer.h>
 
+#include "RootPage.h"
+
 const char* ssid = "Nicks-ESP32";
 const char* password = "SambaSamba";
 
@@ -19,7 +21,8 @@ WebServer server(80);
 const uint8_t led = 2;
 uint8_t ledState = LOW;
 
-void handleRoot() {
+void toggleLed(){
+  Serial.println("led toggle requested");
   if (ledState == LOW){
     digitalWrite(led, HIGH);
     ledState = HIGH;
@@ -29,7 +32,13 @@ void handleRoot() {
     ledState = LOW;
   }
   server.send(200, "text/plain", "led toggled");
-  Serial.println("led toggled");
+  Serial.println("led toggle completed");
+}
+
+void handleRoot() {
+  Serial.println("root page requested");
+  server.send(200, "text/html", RootPage);
+  Serial.println("root page completed");
 }
 
 void setup() {
@@ -46,6 +55,7 @@ void setup() {
   Serial.println(IP);
 
   server.on("/", handleRoot);
+  server.on("/toggleLed", toggleLed);
 
   server.begin();
   Serial.println("HTTP server started");
