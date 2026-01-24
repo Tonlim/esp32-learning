@@ -10,8 +10,10 @@ static const char* RootPage = R"==(
   {
     height: 70vh;
     width: 90vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-
   button
   {
     font-size: 60px;
@@ -20,7 +22,10 @@ static const char* RootPage = R"==(
 </head>
 <body>
 <div id="filldiv">
+  <button type="button" id="turnLedOn">Turn led on</button>
+  <button type="button" id="turnLedOff">Turn led off</button>
   <button type="button" id="toggleLed">Toggle led</button>
+
 </div>
 </body>
 
