@@ -30,6 +30,8 @@ static const char* RootPage = R"==(
 </body>
 
 <script>
+  document.getElementById("turnLedOn").addEventListener("click", () => fetch("/turnLedOn"));
+  document.getElementById("turnLedOff").addEventListener("click", () => fetch("/turnLedOff"));
   document.getElementById("toggleLed").addEventListener("click", () => fetch("/toggleLed"));
 </script>
 </html>

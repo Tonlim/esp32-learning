@@ -21,15 +21,25 @@ WebServer server(80);
 const uint8_t led = 2;
 uint8_t ledState = LOW;
 
+void turnLedOn(){
+  ledState = HIGH;
+  digitalWrite(led, ledState);
+}
+
+void turnLedOff(){
+  ledState = LOW;
+  digitalWrite(led, ledState);
+}
+
 void toggleLed(){
   Serial.println("led toggle requested");
   if (ledState == LOW){
-    digitalWrite(led, HIGH);
     ledState = HIGH;
+    digitalWrite(led, ledState);
   }
   else{
-    digitalWrite(led, LOW);
     ledState = LOW;
+    digitalWrite(led, ledState);
   }
   server.send(200, "text/plain", "led toggled");
   Serial.println("led toggle completed");
@@ -55,6 +65,8 @@ void setup() {
   Serial.println(IP);
 
   server.on("/", handleRoot);
+  server.on("/turnLedOn", turnLedOn);
+  server.on("/turnLedOff", turnLedOff);
   server.on("/toggleLed", toggleLed);
 
   server.begin();
