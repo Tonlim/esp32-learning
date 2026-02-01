@@ -10,6 +10,7 @@ Inspiration:
 
 #include <WiFi.h>
 #include <WebServer.h>
+#include <ESP32Servo.h>
 
 #include "RootPage.h"
 
@@ -21,6 +22,12 @@ WebServer server(80);
 const uint8_t led = 2;
 uint8_t ledState = LOW;
 
+const uint8_t motorOne = 21;
+const uint8_t motorTwo = 19;
+const uint8_t steering = 13;
+
+Servo steeringServo;
+
 void turnLedOn(){
   ledState = HIGH;
   digitalWrite(led, ledState);
@@ -29,6 +36,33 @@ void turnLedOn(){
 void turnLedOff(){
   ledState = LOW;
   digitalWrite(led, ledState);
+}
+
+void motorForward(){
+  digitalWrite(motorOne, HIGH);
+  digitalWrite(motorTwo, LOW);
+}
+
+void motorReverse(){
+  digitalWrite(motorOne, LOW);
+  digitalWrite(motorTwo, HIGH);
+}
+
+void motorStop(){
+  digitalWrite(motorOne, LOW);
+  digitalWrite(motorTwo, LOW);
+}
+
+void steerLeft(){
+  steeringServo.write(0);
+}
+
+void steerStraight(){
+  steeringServo.write(90);
+}
+
+void steerRight(){
+  steeringServo.write(180);
 }
 
 void toggleLed(){
@@ -57,6 +91,13 @@ void setup() {
   pinMode(led, OUTPUT);
   digitalWrite(led, ledState);
 
+  pinMode(motorOne, OUTPUT);
+  digitalWrite(motorOne, LOW);
+  pinMode(motorTwo, OUTPUT);
+  digitalWrite(motorTwo, LOW);
+
+  steeringServo.attach(steering);
+
   Serial.println("Setting AP (Access Point)...");
   WiFi.softAP(ssid, password);
 
@@ -68,6 +109,12 @@ void setup() {
   server.on("/turnLedOn", turnLedOn);
   server.on("/turnLedOff", turnLedOff);
   server.on("/toggleLed", toggleLed);
+  server.on("/motorForward", motorForward);
+  server.on("/motorReverse", motorReverse);
+  server.on("/motorStop", motorStop);
+  server.on("/steerLeft", steerLeft);
+  server.on("/steerStraight", steerStraight);
+  server.on("/steerRight", steerRight);
 
   server.begin();
   Serial.println("HTTP server started");
