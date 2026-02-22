@@ -78,7 +78,6 @@ void steerRight(){
 }
 
 void steeringAngle(){
-  Serial.println(server.arg("value").c_str());
   steeringServo.write(atoi(server.arg("value").c_str())); 
 }
 
@@ -107,9 +106,18 @@ class LambdaDestructor
 };
 
 auto loggingMiddleware(WebServer &server, Middleware::Callback next) -> bool {
-  Serial.println("start - " + server.uri());
-  auto logCompleted = LambdaDestructor([uri = server.uri()](){
-    Serial.println("finish - " + uri);
+  auto path = server.uri();
+  for (int i = 0; i < server.args(); ++i){
+    if (i == 0){
+      path += "?";
+    } else {
+      path += "&";
+    }
+    path += server.argName(i) + "=" + server.arg(i);
+  }
+  Serial.println("start - " + path);
+  auto logCompleted = LambdaDestructor([path](){
+    Serial.println("finish - " + path);
   });
   return next();
 }
