@@ -38,6 +38,18 @@ void turnLedOff(){
   digitalWrite(led, ledState);
 }
 
+void toggleLed(){
+  if (ledState == LOW){
+    ledState = HIGH;
+    digitalWrite(led, ledState);
+  }
+  else{
+    ledState = LOW;
+    digitalWrite(led, ledState);
+  }
+  server.send(200, "text/plain", "led toggled");
+}
+
 void motorForward(){
   digitalWrite(motorOne, HIGH);
   digitalWrite(motorTwo, LOW);
@@ -65,24 +77,41 @@ void steerRight(){
   steeringServo.write(180);
 }
 
-void toggleLed(){
-  Serial.println("led toggle requested");
-  if (ledState == LOW){
-    ledState = HIGH;
-    digitalWrite(led, ledState);
-  }
-  else{
-    ledState = LOW;
-    digitalWrite(led, ledState);
-  }
-  server.send(200, "text/plain", "led toggled");
-  Serial.println("led toggle completed");
+void steeringAngle(){
+  Serial.println(server.arg("value").c_str());
+  steeringServo.write(atoi(server.arg("value").c_str())); 
+}
+
+void throttle(){
+  // TODO: modulate power
+  // TODO: dead mans switch: shut off if we don't get input for 3 seconds
 }
 
 void handleRoot() {
-  Serial.println("root page requested");
   server.send(200, "text/html", RootPage);
-  Serial.println("root page completed");
+}
+
+class LambdaDestructor
+{
+  public:
+    LambdaDestructor(std::function<void(void)> lambda)
+      : m_lambda{std::move(lambda)}
+      { }
+
+    ~LambdaDestructor(){
+      std::invoke(m_lambda);
+    }
+
+  private:
+    std::function<void(void)> m_lambda;
+};
+
+auto loggingMiddleware(WebServer &server, Middleware::Callback next) -> bool {
+  Serial.println("start - " + server.uri());
+  auto logCompleted = LambdaDestructor([uri = server.uri()](){
+    Serial.println("finish - " + uri);
+  });
+  return next();
 }
 
 void setup() {
@@ -105,6 +134,7 @@ void setup() {
   Serial.print("AP IP address: ");
   Serial.println(IP);
 
+  server.addMiddleware(loggingMiddleware);
   server.on("/", handleRoot);
   server.on("/turnLedOn", turnLedOn);
   server.on("/turnLedOff", turnLedOff);
@@ -115,6 +145,9 @@ void setup() {
   server.on("/steerLeft", steerLeft);
   server.on("/steerStraight", steerStraight);
   server.on("/steerRight", steerRight);
+
+  server.on("/steeringAngle", steeringAngle);
+  server.on("/throttle", throttle);
 
   server.begin();
   Serial.println("HTTP server started");
